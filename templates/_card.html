@@ -1,0 +1,9 @@
+<article class="card kind-{{ item.kind }}">
+  <a class="card-link" href="/item/{{ item.id }}">
+    <span class="kind">{{ item.kind }}{% if item.year %}, {{ item.year }}{% endif %}</span>
+    <h3>{{ item.title }}</h3>
+    <p class="genres">{{ item.genres }}</p>
+  </a>
+  {% if my_rating %}<p class="mine">You gave {{ my_rating }}/5</p>{% endif %}
+  {% if note %}<p class="note">{{ note }}</p>{% endif %}
+</article>

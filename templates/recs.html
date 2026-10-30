@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}For you · Next Up{% endblock %}
+{% block content %}
+<h1>Picked for you</h1>
+<div class="chips">
+  <a href="/recommendations" class="chip {% if not kind %}on{% endif %}">All</a>
+  {% for k in kinds %}<a href="/recommendations?kind={{ k }}" class="chip {% if kind == k %}on{% endif %}">{{ k }}</a>{% endfor %}
+</div>
+{% if not recs %}
+  <p class="empty">
+    {% if rated_count == 0 %}You haven't rated anything yet. <a href="/">Rate a few titles</a>, giving 4 or 5 to the ones you liked.
+    {% else %}Nothing to suggest yet. Give a 4 or 5 to something you liked, then check back. <a href="/">Browse titles</a>{% endif %}
+  </p>
+{% endif %}
+<div class="grid">
+  {% for r in recs %}
+    {% set item = r.item %}{% set my_rating = None %}{% set note = r.reason ~ " (" ~ r.score ~ "% match)" %}
+    {% include "_card.html" %}
+  {% endfor %}
+</div>
+{% endblock %}

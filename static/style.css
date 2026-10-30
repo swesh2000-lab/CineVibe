@@ -1,0 +1,59 @@
+:root {
+  --bg: #eef0f3; --surface: #fff; --ink: #1a2230; --muted: #5b6676; --line: #d5dae1;
+  --accent: #2f5bea; --accent-ink: #fff;
+  --film: #c2410c; --show: #0f766e; --anime: #7c3aed; --book: #a16207;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #11151c; --surface: #1a212c; --ink: #e8ecf2; --muted: #9aa5b5; --line: #2b3442;
+          --accent: #7b9bff; --accent-ink: #11151c;
+          --film: #fb923c; --show: #2dd4bf; --anime: #a78bfa; --book: #facc15; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, sans-serif; }
+h1, h2, h3, .brand { font-family: "Bricolage Grotesque", system-ui, sans-serif; line-height: 1.15; }
+h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 800; margin: 0 0 1rem; }
+h2 { font-size: 1.1rem; margin: 2rem 0 .5rem; }
+a { color: var(--accent); }
+main { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+
+.top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;
+       padding: .8rem 1rem; border-bottom: 1px solid var(--line); background: var(--surface); }
+.brand { font-weight: 800; font-size: 1.3rem; color: var(--ink); text-decoration: none; }
+nav { display: flex; gap: .25rem; }
+nav a { padding: .4rem .75rem; border-radius: 6px; color: var(--muted); text-decoration: none; }
+nav a[aria-current] { background: var(--accent); color: var(--accent-ink); }
+
+.filters { display: grid; gap: .75rem; margin-bottom: 1.25rem; }
+input[type=search] { width: 100%; padding: .65rem .8rem; font: inherit; color: var(--ink);
+                     background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+.chips { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.filters .chips { margin: 0; }
+.chip { padding: .3rem .8rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+        color: var(--ink); text-decoration: none; text-transform: capitalize; }
+.chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.grid { display: grid; gap: .9rem; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--c, var(--line));
+        border-radius: 6px; padding: .9rem 1rem; }
+.kind-film { --c: var(--film); } .kind-show { --c: var(--show); }
+.kind-anime { --c: var(--anime); } .kind-book { --c: var(--book); }
+.card-link { color: inherit; text-decoration: none; display: block; }
+.card h3 { margin: .15rem 0 .35rem; font-size: 1.15rem; }
+.kind { color: var(--c); font-weight: 600; font-size: .85rem; text-transform: capitalize; }
+.genres { color: var(--muted); margin: 0; font-size: .9rem; }
+.mine { margin: .6rem 0 0; font-weight: 600; }
+.note { margin: .6rem 0 0; font-size: .9rem; }
+
+.detail { background: var(--surface); border: 1px solid var(--line); border-left: 6px solid var(--c);
+          border-radius: 6px; padding: 1.5rem; max-width: 640px; }
+.desc { max-width: 60ch; }
+.back { display: inline-block; margin-bottom: 1rem; }
+.rate { display: flex; gap: .5rem; }
+.rate button { width: 2.9rem; height: 2.9rem; font: 700 1.1rem "Bricolage Grotesque", sans-serif; cursor: pointer;
+               color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; }
+.rate button:hover { border-color: var(--accent); }
+.rate button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button.link { background: none; border: 0; padding: 0; margin-top: .75rem; color: var(--accent);
+              font: inherit; cursor: pointer; text-decoration: underline; }
+.hint, .empty { color: var(--muted); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }

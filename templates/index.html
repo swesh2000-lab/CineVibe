@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Find something to rate</h1>
+<form class="filters" method="get" action="/">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search title or genre" aria-label="Search">
+  <div class="chips">
+    <a href="/" class="chip {% if not kind %}on{% endif %}">All</a>
+    {% for k in kinds %}<a href="/?kind={{ k }}" class="chip {% if kind == k %}on{% endif %}">{{ k }}</a>{% endfor %}
+  </div>
+</form>
+{% if not items %}
+  <p class="empty">Nothing matches "{{ q }}". Try a genre like thriller or fantasy.</p>
+{% endif %}
+<div class="grid">
+  {% for item in items %}
+    {% set my_rating = ratings.get(item.id) %}{% set note = None %}
+    {% include "_card.html" %}
+  {% endfor %}
+</div>
+{% endblock %}

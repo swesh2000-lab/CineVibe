@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ item.title }} · Next Up{% endblock %}
+{% block content %}
+<a class="back" href="javascript:history.back()">Back</a>
+<section class="detail kind-{{ item.kind }}">
+  <span class="kind">{{ item.kind }}{% if item.year %}, {{ item.year }}{% endif %}</span>
+  <h1>{{ item.title }}</h1>
+  <p class="genres">{{ item.genres }}</p>
+  <p class="desc">{{ item.description }}</p>
+
+  <h2>Your rating</h2>
+  <form method="post" action="/rate/{{ item.id }}" class="rate">
+    <input type="hidden" name="next" value="/item/{{ item.id }}">
+    {% for n in range(1, 6) %}
+      <button name="rating" value="{{ n }}" class="{% if rating == n %}on{% endif %}" aria-label="Rate {{ n }} out of 5">{{ n }}</button>
+    {% endfor %}
+  </form>
+  {% if rating %}
+  <form method="post" action="/unrate/{{ item.id }}">
+    <input type="hidden" name="next" value="/item/{{ item.id }}">
+    <button class="link">Remove rating</button>
+  </form>
+  {% else %}
+  <p class="hint">1 = disliked, 5 = loved. Ratings of 4 and 5 shape your recommendations most.</p>
+  {% endif %}
+</section>
+{% endblock %}

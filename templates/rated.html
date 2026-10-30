@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}My ratings · Next Up{% endblock %}
+{% block content %}
+<h1>My ratings</h1>
+{% if not rows %}<p class="empty">No ratings yet. <a href="/">Find something to rate</a></p>{% endif %}
+<div class="grid">
+  {% for item in rows %}
+    {% set my_rating = item.rating %}{% set note = None %}
+    {% include "_card.html" %}
+  {% endfor %}
+</div>
+{% endblock %}
