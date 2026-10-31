@@ -1,6 +1,10 @@
 <article class="card kind-{{ item.kind }}">
   <a class="card-link" href="/item/{{ item.id }}">
-    <span class="kind">{{ item.kind }}{% if item.year %}, {{ item.year }}{% endif %}</span>
+    <div class="poster" style="--h: {{ (item.id * 47) % 360 }}" aria-hidden="true">
+      <span class="initial">{{ item.title[0] }}</span>
+      <span class="pyear">{{ item.year or '' }}</span>
+    </div>
+    <span class="kind">{{ item.kind }}</span>
     <h3>{{ item.title }}</h3>
     <p class="genres">{{ item.genres }}</p>
   </a>

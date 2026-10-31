@@ -11,6 +11,12 @@ from recommender import KINDS, recommend
 
 BASE = Path(__file__).parent
 
+SORTS = {
+    "title": "title COLLATE NOCASE ASC",
+    "newest": "year DESC, title COLLATE NOCASE ASC",
+    "oldest": "year ASC, title COLLATE NOCASE ASC",
+}
+
 
 @asynccontextmanager
 async def lifespan(app):
@@ -32,16 +38,31 @@ def _render(request, name, **ctx):
 
 
 @app.get("/")
-def browse(request: Request, kind: str | None = None, q: str = ""):
-    sql, args = "SELECT * FROM items WHERE 1=1", []
-    if kind in KINDS:
-        sql += " AND kind = ?"; args.append(kind)
-    if q.strip():
-        sql += " AND (title LIKE ? OR genres LIKE ?)"; args += [f"%{q.strip()}%"] * 2
+def browse(request: Request, kind: str | None = None, q: str = "", genre: str = "", sort: str = "title"):
+    if sort not in SORTS:
+        sort = "title"
     with get_conn() as conn:
-        items = conn.execute(sql + " ORDER BY title", args).fetchall()
+        all_genres = sorted(
+            {g.strip() for row in conn.execute("SELECT genres FROM items") for g in row["genres"].split(",") if g.strip()}
+        )
+        sql, args = "SELECT * FROM items WHERE 1=1", []
+        if kind in KINDS:
+            sql += " AND kind = ?"
+            args.append(kind)
+        if q.strip():
+            sql += " AND (title LIKE ? OR genres LIKE ?)"
+            args += [f"%{q.strip()}%"] * 2
+        if genre in all_genres:
+            sql += " AND (',' || REPLACE(genres, ' ', '') || ',') LIKE ?"
+            args.append(f"%,{genre},%")
+        else:
+            genre = ""
+        items = conn.execute(sql + " ORDER BY " + SORTS[sort], args).fetchall()
         ratings = _ratings(conn)
-    return _render(request, "index.html", items=items, ratings=ratings, kind=kind, q=q, page="browse")
+    return _render(
+        request, "index.html", items=items, ratings=ratings, kind=kind, q=q,
+        genre=genre, sort=sort, all_genres=all_genres, page="browse",
+    )
 
 
 @app.get("/item/{item_id}")
@@ -51,7 +72,8 @@ def detail(request: Request, item_id: int):
         if not item:
             raise HTTPException(404, "Item not found")
         rating = _ratings(conn).get(item_id)
-    return _render(request, "item.html", item=item, rating=rating, page="browse")
+        watching = conn.execute("SELECT 1 FROM watchlist WHERE item_id = ?", (item_id,)).fetchone() is not None
+    return _render(request, "item.html", item=item, rating=rating, watching=watching, page="browse")
 
 
 @app.post("/rate/{item_id}")
@@ -90,3 +112,28 @@ def rated(request: Request):
             "SELECT i.*, r.rating FROM ratings r JOIN items i ON i.id = r.item_id ORDER BY r.rated_at DESC"
         ).fetchall()
     return _render(request, "rated.html", rows=rows, page="rated")
+
+
+@app.post("/watch/{item_id}")
+def watch(item_id: int, next: str = Form("/")):
+    with get_conn() as conn:
+        if not conn.execute("SELECT 1 FROM items WHERE id = ?", (item_id,)).fetchone():
+            raise HTTPException(404, "Item not found")
+        conn.execute("INSERT OR IGNORE INTO watchlist (item_id) VALUES (?)", (item_id,))
+    return RedirectResponse(next if next.startswith("/") else "/", status_code=303)
+
+
+@app.post("/unwatch/{item_id}")
+def unwatch(item_id: int, next: str = Form("/")):
+    with get_conn() as conn:
+        conn.execute("DELETE FROM watchlist WHERE item_id = ?", (item_id,))
+    return RedirectResponse(next if next.startswith("/") else "/", status_code=303)
+
+
+@app.get("/watchlist")
+def watchlist(request: Request):
+    with get_conn() as conn:
+        rows = conn.execute(
+            "SELECT i.* FROM watchlist w JOIN items i ON i.id = w.item_id ORDER BY w.added_at DESC"
+        ).fetchall()
+    return _render(request, "watchlist.html", rows=rows, page="watchlist")

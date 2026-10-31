@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ item.title }} · Next Up{% endblock %}
+{% block title %}{{ item.title }} · CineVibe{% endblock %}
 {% block content %}
 <a class="back" href="javascript:history.back()">Back</a>
 <section class="detail kind-{{ item.kind }}">
@@ -22,6 +22,19 @@
   </form>
   {% else %}
   <p class="hint">1 = disliked, 5 = loved. Ratings of 4 and 5 shape your recommendations most.</p>
+  {% endif %}
+
+  <h2>Watchlist</h2>
+  {% if watching %}
+  <form method="post" action="/unwatch/{{ item.id }}">
+    <input type="hidden" name="next" value="/item/{{ item.id }}">
+    <button class="btn-solid">Remove from watchlist</button>
+  </form>
+  {% else %}
+  <form method="post" action="/watch/{{ item.id }}">
+    <input type="hidden" name="next" value="/item/{{ item.id }}">
+    <button class="btn-solid">Add to watchlist</button>
+  </form>
   {% endif %}
 </section>
 {% endblock %}

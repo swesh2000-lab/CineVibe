@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Watchlist · CineVibe{% endblock %}
+{% block content %}
+<h1>My watchlist</h1>
+{% if not rows %}<p class="empty">Your watchlist is empty. Open a title and press "Add to watchlist".</p>{% endif %}
+<div class="grid">
+  {% for item in rows %}
+    {% set my_rating = None %}{% set note = None %}
+    {% include "_card.html" %}
+  {% endfor %}
+</div>
+{% endblock %}

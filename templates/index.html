@@ -1,15 +1,41 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Find something to rate</h1>
+<section class="hero">
+  <h1>Rate what you've watched and read. Get what's next.</h1>
+  <p>Give a few titles 4 or 5 stars, and CineVibe suggests films, shows, anime and books you'll probably like.</p>
+  <a class="btn" href="/recommendations">See picks for you</a>
+</section>
+
 <form class="filters" method="get" action="/">
+  {% if kind %}<input type="hidden" name="kind" value="{{ kind }}">{% endif %}
   <input type="search" name="q" value="{{ q }}" placeholder="Search title or genre" aria-label="Search">
+  <div class="selects">
+    <label>Genre
+      <select name="genre" onchange="this.form.submit()">
+        <option value="">All genres</option>
+        {% for g in all_genres %}<option value="{{ g }}" {% if g == genre %}selected{% endif %}>{{ g }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Sort by
+      <select name="sort" onchange="this.form.submit()">
+        <option value="title" {% if sort == 'title' %}selected{% endif %}>Title A to Z</option>
+        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest first</option>
+        <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest first</option>
+      </select>
+    </label>
+    <button class="btn-solid" type="submit">Search</button>
+    {% if q or genre or kind or sort != 'title' %}<a href="/" class="clear">Clear all</a>{% endif %}
+  </div>
   <div class="chips">
-    <a href="/" class="chip {% if not kind %}on{% endif %}">All</a>
-    {% for k in kinds %}<a href="/?kind={{ k }}" class="chip {% if kind == k %}on{% endif %}">{{ k }}</a>{% endfor %}
+    {% set rest = "&q=" ~ (q | urlencode) ~ "&genre=" ~ (genre | urlencode) ~ "&sort=" ~ sort %}
+    <a href="/?kind={{ rest }}" class="chip {% if not kind %}on{% endif %}">All</a>
+    {% for k in kinds %}<a href="/?kind={{ k }}{{ rest }}" class="chip {% if kind == k %}on{% endif %}">{{ k }}</a>{% endfor %}
   </div>
 </form>
+
+<p class="count">{{ items | length }} title{{ '' if items | length == 1 else 's' }}</p>
 {% if not items %}
-  <p class="empty">Nothing matches "{{ q }}". Try a genre like thriller or fantasy.</p>
+  <p class="empty">Nothing matches these filters. Try removing the genre or search text.</p>
 {% endif %}
 <div class="grid">
   {% for item in items %}
